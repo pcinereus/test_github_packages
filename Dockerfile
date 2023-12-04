@@ -1,0 +1,3 @@
+ARG ALPINE_VERSION=3.18.4
+
+FROM alpine:${ALPINE_VERSION} as build
