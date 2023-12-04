@@ -1,3 +1,11 @@
 ARG ALPINE_VERSION=3.18.4
 
 FROM alpine:${ALPINE_VERSION} as build
+
+ENV _R_SHLIB_STRIP_=true
+
+ARG R_VERSION=4.3.2
+
+WORKDIR /root
+
+RUN apk update
