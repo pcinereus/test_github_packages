@@ -1,21 +1,45 @@
-FROM rhub/r-minimal
+## Get R version 4.3.2
+FROM rocker/r-ver:4.3.2
 
-RUN installr -d tidyverse/dplyr@v1.0.10
+## Install packages
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    libudunits2-dev \
+    libssl-dev \
+    libgdal-dev \
+    libproj-dev \
+    libgeos-dev \
+  && rm -rf /var/lib/apt/lists/*
 
-# RUN installr -d remotes
+## A selection of tidyverse packages
+RUN R -e "options(repos = \
+  list(CRAN = 'https://packagemanager.posit.co/cran/2023-12-01/')); \
+  install.packages('dplyr'); \
+  install.packages('lubridate'); \
+  install.packages('ggplot2'); \
+  install.packages('readr'); \
+  install.packages('stringr'); \
+  install.packages('tidyr'); \
+"  
 
-# RUN installr -d dplyr
-# RUN installr -d -t gfortran ggplot2
+RUN R -e "options(repos = \
+  list(CRAN = 'https://packagemanager.posit.co/cran/2023-12-01/')); \
+  install.packages('crayon'); \
+  install.packages('cli'); \
+  install.packages('validate'); \
+"  
 
-# RUN apk add --no-cache --update-cache \
-#         --repository http://nl.alpinelinux.org/alpine/v3.11/main \
-#         autoconf=2.69-r2 \
-#         automake=1.16.1-r0 && \
-#     # repeat autoconf and automake (under `-t`)
-#     # to (auto)remove them after installation
-#     installr -d \
-#         -t "libsodium-dev curl-dev linux-headers autoconf automake" \
-#         -a libsodium \
-#         shiny
+RUN R -e "options(repos = \
+  list(CRAN = 'https://packagemanager.posit.co/cran/2023-12-01/')); \
+  install.packages('remotes'); \
+"
 
-# CMD [ "R", "--slave", "-e", "cat(sessionInfo())" ]
+RUN R -e "options(repos = \
+  list(CRAN = 'https://packagemanager.posit.co/cran/2023-12-01/')); \
+  remotes::install_github('open-AIMS/status@v0.0.1'); \
+  remotes::install_github('open-AIMS/sedMon@v0.0.1'); \
+"
+
+RUN apt-get clean
+
+CMD ["R"]
